@@ -14,18 +14,18 @@ services:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./mysql-init-scripts:/docker-entrypoint-initdb.d
+      - ./mysql-init-scripts:/docker-entrypoint-initdb.d # Make sure this folder contains the SQL initialization scripts
 
   backend:
     build:
       context: ./backend
     container_name: backend_container
     environment:
-      DB_HOST: mysql
+      DB_HOST: mysql        # This is the service name for the MySQL container
       DB_USER: testuser
       DB_PASSWORD: testpassword
       DB_NAME: testdb
-      DB_PORT: 3306:3306
+      DB_PORT: 3306         # Correcting to just the internal port
     ports:
       - "3001:3001"
     depends_on:
