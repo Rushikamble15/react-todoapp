@@ -1,14 +1,14 @@
+require('dotenv').config(); // Load environment variables from .env file
 const mysql = require('mysql2');
 
-// Create a connection to the database
+// Create a connection to the database using environment variables
 const connection = mysql.createConnection({
-    host: 'localhost',     // Use container's internal IP
-    user: 'root',            // MySQL root user
-    password: 'admin',       // Root password
-    database: 'todolist',    // Database name
-    port: 3306               // Port number
-  });
-  
+    host: process.env.DB_HOST,     // Host from environment variable (usually 'localhost' or 'mysql' in Docker)
+    user: process.env.DB_USER,     // User from environment variable (e.g. 'testuser')
+    password: process.env.DB_PASSWORD,  // Password from environment variable
+    database: process.env.DB_NAME,     // Database name from environment variable (e.g. 'testdb')
+    port: process.env.DB_PORT,          // Port from environment variable (usually 3306)
+});
 
 // Connect to the MySQL server
 connection.connect((err) => {
