@@ -1,12 +1,12 @@
 require('dotenv').config(); // Load environment variables from .env file
 const express = require('express');
 const mysql = require('mysql2');
-const cors = require('cors'); // Import the cors package
+const cors = require('cors');
 const app = express();
 
-// Enable CORS for requests from 'http://192.168.56.1:3000'
+// Enable CORS for requests from any origin (or specify your frontend's origin)
 app.use(cors({
-  origin: '*', // Change this to your frontend's origin
+  origin: '*' // You can specify a specific frontend URL here if needed
 }));
 
 // Middleware for parsing JSON and urlencoded data
@@ -15,19 +15,19 @@ app.use(express.urlencoded({ extended: true }));
 
 // Create MySQL connection using environment variables from .env
 const pool = mysql.createPool({
-    host: process.env.DB_HOST,        // Using DB_HOST from .env
-    user: process.env.DB_USER,        // Using DB_USER from .env
-    password: process.env.DB_PASSWORD, // Using DB_PASSWORD from .env
-    database: process.env.DB_NAME,    // Using DB_NAME from .env
-    port: process.env.DB_PORT,        // Using DB_PORT from .env
-    connectionLimit: 10,
-    connectTimeout: 10000,
+  host: process.env.DB_HOST,        // Using DB_HOST from .env
+  user: process.env.DB_USER,        // Using DB_USER from .env
+  password: process.env.DB_PASSWORD, // Using DB_PASSWORD from .env
+  database: process.env.DB_NAME,    // Using DB_NAME from .env
+  port: process.env.DB_PORT,        // Using DB_PORT from .env
+  connectionLimit: 10,
+  connectTimeout: 10000,
 });
-  
+
 // Test database connection
 pool.getConnection((err) => {
   if (err) {
-    console.error('MySQL connection failed:', err);  // Log the connection error
+    console.error('MySQL connection failed:', err); // Log the connection error
   } else {
     console.log('MySQL connected successfully');
   }
@@ -51,15 +51,14 @@ app.get('/api/todos', (req, res) => {
 // Add a new todo
 app.post('/api/todos', (req, res) => {
   const { title } = req.body;
-  
-  // console.log(req.body);
+
   if (!title) {
     return res.status(400).json({ error: 'Title is required' });
   }
 
   pool.query('INSERT INTO tasks (title) VALUES (?)', [title], (err, results) => {
     if (err) {
-        console.log("error is ", err)
+      console.log("error is ", err);
       return res.status(500).json({ error: err.message });
     }
     res.status(201).json({ id: results.insertId, title });
@@ -86,8 +85,8 @@ app.use((err, req, res, next) => {
   res.status(500).send('Something broke!');
 });
 
-// Start server
-const PORT = process.env.PORT || 3001; // Use the environment variable PORT or default to 3001
-app.listen(PORT, () => {
+// Start server on all interfaces (0.0.0.0)
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server is running on port ${PORT}`);
 });
